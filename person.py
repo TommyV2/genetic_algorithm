@@ -9,26 +9,34 @@ class Person:
         self.agility = agility
         self.speed = speed
         self.explosivness = explosivness
+        self.stats_string=""
+        self.valid_person = True
+        self.update()  
+                      
+    def update(self):
         self.modify_attributes()
-        self.stats_string = self.stats_to_bits()
+        if self.validate_stats() == 0:
+            self.valid_person = False
+        else:
+            self.stats_string = self.stats_to_bits()
 
     def modify_attributes(self):
-        if self.height > 180:
-            bonus = int((self.height - 180)/10)
+        if self.height > 190:
+            bonus = int((self.height - 190)/5)
             self.agility -= bonus
             self.speed += bonus
-        elif self.height < 160:
-            bonus = int((160-self.height)/10)
+        elif self.height < 170:
+            bonus = int((170-self.height)/5)
             self.agility += bonus
             self.speed -= bonus
         if self.weight > 90:
-            bonus = int((self.weight - 90)/10)
+            bonus = int((self.weight - 90)/5)
             self.agility -= bonus
             self.endurance -= bonus
             self.explosivness -= bonus
             self.strength += bonus
         elif self.weight < 70:
-            bonus = int((70 - self.weight)/10)
+            bonus = int((70 - self.weight)/5)
             self.agility += bonus
             self.endurance += bonus
             self.explosivness += bonus
@@ -101,6 +109,49 @@ class Person:
         self.speed = int(str, 2)
         str = '0b'+stats_string[34:38]
         self.explosivness = int(str, 2)
+
+    def validate_stats(self):
+        if self.age < 15 or self.age > 60:
+            return 0
+        if self.height > 220 or self.height < 160:
+            return 0
+        if self.weight > 120 or self.weight < 50:
+            return 0
+        if self.strength > 15 or self.strength < 0:
+            return 0
+        if self.endurance > 15 or self.endurance < 0:
+            return 0
+        if self.agility > 15 or self.agility < 0:
+            return 0
+        if self.speed > 15 or self.speed < 0:
+            return 0
+        if self.explosivness > 15 or self.explosivness < 0:
+            return 0
+        return 1
+
+    def evaluate_fitness(self, sport): 
+        if sport == "martial_arts":
+            fitness = self.explosivness * 2 + self.endurance * 2 + self.agility * 2 + self.strength + self.speed
+            return fitness
+        elif sport == "football":
+            fitness = self.explosivness + self.endurance * 2 + self.agility * 2 + self.strength + self.speed * 2
+            return fitness
+        elif sport == "basketball":
+            fitness = 5/6 * (self.height * 2 + self.explosivness + self.endurance  + self.agility * 2 + self.strength + self.speed * 2)
+            return fitness
+        elif sport == "powerlifing": 
+            fitness = 5/6 * (self.weight * 2 + self.explosivness * 2 + self.endurance  + self.agility  + self.strength * 2 + self.speed)
+            return fitness
+        else:
+          return 0
+
+    def mutate(self):
+        ### na koncu metod zmieniajacych atrybuty nalezy dodac update()
+        self.update()
+
+    def crossing(self, another_person):
+        ###
+        return new_person  
 
     def print_stats(self):
         return print("\nAge: ", self.age, "\nHeight: ", self.height, "cm", "\nWeight: ", self.weight, "kg", "\nStrenght: ", self.strength,
