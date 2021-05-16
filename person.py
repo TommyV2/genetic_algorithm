@@ -1,3 +1,4 @@
+import random
 
 class Person:
     def __init__(self, age, height, weight, strength, endurance, agility, speed, explosivness):
@@ -127,9 +128,14 @@ class Person:
             return 0
         if self.explosivness > 15 or self.explosivness < 0:
             return 0
+        skill_points = self.strength + self.endurance + self.agility + self.speed + self.explosivness
+        if skill_points > 60:
+            return 0
         return 1
 
     def evaluate_fitness(self, sport): 
+        if self.valid_person == False:
+            return 0
         if sport == "martial_arts":
             fitness = self.explosivness * 2 + self.endurance * 2 + self.agility * 2 + self.strength + self.speed
             return fitness
@@ -137,21 +143,47 @@ class Person:
             fitness = self.explosivness + self.endurance * 2 + self.agility * 2 + self.strength + self.speed * 2
             return fitness
         elif sport == "basketball":
-            fitness = 5/6 * (self.height * 2 + self.explosivness + self.endurance  + self.agility * 2 + self.strength + self.speed * 2)
+            fitness = 5/6 * (15/220 * self.height * 2 + self.explosivness + self.endurance  + self.agility * 2 + self.strength + self.speed * 2)
             return fitness
         elif sport == "powerlifing": 
-            fitness = 5/6 * (self.weight * 2 + self.explosivness * 2 + self.endurance  + self.agility  + self.strength * 2 + self.speed)
+            fitness = 5/6 * (15/120 * self.weight * 2 + self.explosivness * 2 + self.endurance  + self.agility  + self.strength * 2 + self.speed)
             return fitness
         else:
           return 0
 
     def mutate(self):
-        ### na koncu metod zmieniajacych atrybuty nalezy dodac update()
+        size = len(self.stats_string)
+        mutated_index = random.randrange(size)
+        if self.stats_string[mutated_index] == "0":
+            self.stats_string = self.stats_string[:mutated_index] + "1" + self.stats_string[mutated_index+1:]           
+        else:
+            self.stats_string = self.stats_string[:mutated_index] + "0" + self.stats_string[mutated_index+1:] 
+        self.bits_to_stats(self.stats_string)
         self.update()
 
     def crossing(self, another_person):
-        ###
-        return new_person  
+        size = len(self.stats_string)
+        crossing_index = random.randrange(size)
+        new_person_stats_string = self.stats_string[:crossing_index]+another_person.stats_string[crossing_index:]
+        str = '0b'+new_person_stats_string[0:6]
+        age = int(str, 2)
+        str = '0b'+new_person_stats_string[6:12]
+        height = int(str, 2)+160
+        str = '0b'+new_person_stats_string[12:18]
+        weight = int(str, 2)+50
+        str = '0b'+new_person_stats_string[18:22]
+        strength = int(str, 2)
+        str = '0b'+new_person_stats_string[22:26]
+        endurance = int(str, 2)
+        str = '0b'+new_person_stats_string[26:30]
+        agility = int(str, 2)
+        str = '0b'+new_person_stats_string[30:34]
+        speed = int(str, 2)
+        str = '0b'+new_person_stats_string[34:38]
+        explosivness = int(str, 2)
+
+        new_person = Person(age, height, weight, strength, endurance, agility, speed, explosivness)
+        return new_person
 
     def print_stats(self):
         return print("\nAge: ", self.age, "\nHeight: ", self.height, "cm", "\nWeight: ", self.weight, "kg", "\nStrenght: ", self.strength,
