@@ -12,8 +12,12 @@ class Person:
         self.explosivness = explosivness
         self.stats_string=""
         self.valid_person = True
+        self.the_best = False
         self.update()  
-                      
+
+    def set_the_best(self): 
+        self.the_best = True
+
     def update(self):
         self.modify_attributes()
         if self.validate_stats() == 0:
@@ -145,26 +149,30 @@ class Person:
         elif sport == "basketball":
             fitness = 5/6 * (15/220 * self.height * 2 + self.explosivness + self.endurance  + self.agility * 2 + self.strength + self.speed * 2)
             return fitness
-        elif sport == "powerlifing": 
+        elif sport == "powerlifting": 
             fitness = 5/6 * (15/120 * self.weight * 2 + self.explosivness * 2 + self.endurance  + self.agility  + self.strength * 2 + self.speed)
             return fitness
         else:
           return 0
 
     def mutate(self):
-        size = len(self.stats_string)
-        mutated_index = random.randrange(size)
-        if self.stats_string[mutated_index] == "0":
-            self.stats_string = self.stats_string[:mutated_index] + "1" + self.stats_string[mutated_index+1:]           
-        else:
-            self.stats_string = self.stats_string[:mutated_index] + "0" + self.stats_string[mutated_index+1:] 
-        self.bits_to_stats(self.stats_string)
-        self.update()
+        if self.the_best == False:
+            size = len(self.stats_string)
+            mutated_index = random.randrange(size)
+            if self.stats_string[mutated_index] == "0":
+                self.stats_string = self.stats_string[:mutated_index] + "1" + self.stats_string[mutated_index+1:]           
+            else:
+                self.stats_string = self.stats_string[:mutated_index] + "0" + self.stats_string[mutated_index+1:] 
+            self.bits_to_stats(self.stats_string)
+            self.update()
 
     def crossing(self, another_person):
         size = len(self.stats_string)
         crossing_index = random.randrange(size)
-        new_person_stats_string = self.stats_string[:crossing_index]+another_person.stats_string[crossing_index:]
+        cpy1 = self.stats_string
+        cpy2 = another_person.stats_string
+
+        new_person_stats_string = cpy1[:crossing_index]+cpy2[crossing_index:]
         str = '0b'+new_person_stats_string[0:6]
         age = int(str, 2)
         str = '0b'+new_person_stats_string[6:12]
